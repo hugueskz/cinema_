@@ -47,7 +47,8 @@ t = {
         "name_btn": "Start Challenge 🎬",
         "step1": "Phase 1: Noir Cinema Showdown 🍿",
         "caught": "🎉 Villain Defeated! Phase 1 completed!",
-        "unlock_btn": "🔓 Continue to Quiz / Continua al Quiz",
+        "unlock_btn": "➡️ Proceed to Phase 2: Cinema Quiz! 🎥",
+        "manual_skip": "🔓 Defeated Villain? Click to Unlock Phase 2",
         "step2": "Phase 2: 50s & 60s French & Italian Cinema Quiz 🎥",
         "quiz_intro": "Answer these 3 classic movie questions to calculate your Film Critic Rank:",
         "q1": "1. Who directed the iconic 1960 Italian film 'La Dolce Vita'?",
@@ -90,7 +91,8 @@ t = {
         "name_btn": "Inizia la Sfida 🎬",
         "step1": "Fase 1: Scontro Film Noir 🍿",
         "caught": "🎉 Cattivo Sconfitto! Fase 1 completata!",
-        "unlock_btn": "🔓 Continua al Quiz / Continue to Quiz",
+        "unlock_btn": "➡️ Passa alla Fase 2: Quiz Cinematografico! 🎥",
+        "manual_skip": "🔓 Cattivo sconfitto? Clicca per sbloccare la Fase 2",
         "step2": "Fase 2: Quiz sul Cinema Francese e Italiano Anni '50 e '60 🎥",
         "quiz_intro": "Rispondi a queste 3 domande per scoprire il tuo livello di Critico Cinematografico:",
         "q1": "1. Chi ha diretto il celebre film italiano del 1960 'La Dolce Vita'?",
@@ -127,7 +129,7 @@ t = {
     }
 }[lang]
 
-# Banner Image / Poster
+# Banner Image
 st.image("https://m.media-amazon.com/images/M/MV5BMTkxMjQ4NzU5N15BMl5BanBnXkFtZTgwMTkwODkzMTE@._V1_FMjpg_UX1000_.jpg", use_container_width=True)
 
 st.title(t["title"])
@@ -158,12 +160,11 @@ if not st.session_state.player_name:
             st.warning("Please enter a valid name / Per favore inserisci un nome valido")
     st.stop()
 
-# Display Welcome Banner with Player Name
+# Welcome Banner
 st.markdown(f"### 👋 Welcome / Benvenuta/o, **{st.session_state.player_name}**!")
-
 st.markdown("---")
 
-# --- STEP 1: RETRO NOIR GAME WITH SOUND & EASY HP ---
+# --- STEP 1: RETRO NOIR GAME ---
 st.subheader(t["step1"])
 
 query_params = st.query_params
@@ -187,7 +188,6 @@ if not st.session_state.game_won:
     const canvas = document.getElementById("noirCanvas");
     const ctx = canvas.getContext("2d");
 
-    // Web Audio Synthesizer Sound Effects
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     
     function playSound(type) {
@@ -225,9 +225,8 @@ if not st.session_state.game_won:
         }
     }
 
-    // Player and Boss setup (Boss HP reduced to 50 for quick victory)
     let player = { x: 90, y: 190, w: 55, h: 120, hp: 100, attacking: false };
-    let boss = { x: 440, y: 180, w: 65, h: 130, hp: 50, state: 'idle' };
+    let boss = { x: 440, y: 180, w: 65, h: 130, hp: 30, state: 'idle' };
     let gameOver = false;
     let rain = [];
 
@@ -299,7 +298,6 @@ if not st.session_state.game_won:
         drawTexturePlayer();
         drawTextureBoss();
 
-        // Health Bars
         ctx.fillStyle = "#222";
         ctx.fillRect(20, 15, 160, 18);
         ctx.fillRect(420, 15, 160, 18);
@@ -307,7 +305,7 @@ if not st.session_state.game_won:
         ctx.fillStyle = "#00e676";
         ctx.fillRect(22, 17, player.hp * 1.56, 14);
         ctx.fillStyle = "#ff1744";
-        ctx.fillRect(422, 17, boss.hp * 3.12, 14);
+        ctx.fillRect(422, 17, boss.hp * 5.2, 14);
 
         ctx.strokeStyle = "#fff";
         ctx.strokeRect(20, 15, 160, 18);
@@ -329,7 +327,7 @@ if not st.session_state.game_won:
             const url = new URL(window.location.href);
             url.searchParams.set("game_status", "won");
             window.parent.location.href = url.href;
-        }, 300);
+        }, 200);
     }
 
     function movePlayer(dx) {
@@ -344,7 +342,7 @@ if not st.session_state.game_won:
         setTimeout(() => { player.attacking = false; }, 150);
 
         if (Math.abs((player.x + player.w) - boss.x) < 55) {
-            boss.hp -= 25; // Massive hit
+            boss.hp -= 15;
             boss.state = 'hit';
             setTimeout(() => { boss.state = 'idle'; }, 150);
             if (boss.hp <= 0) {
@@ -359,7 +357,7 @@ if not st.session_state.game_won:
         playSound('flash');
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        boss.hp -= 35; // Instant high damage
+        boss.hp -= 30;
         if (boss.hp <= 0) {
             boss.hp = 0;
             triggerWin();
@@ -382,7 +380,13 @@ if not st.session_state.game_won:
     gameLoop();
     </script>
     """
-    st.components.v1.html(game_html, height=450)
+    st.components.v1.html(game_html, height=430)
+    
+    # Manual bypass button directly visible under game
+    if st.button(t["manual_skip"]):
+        st.session_state.game_won = True
+        st.rerun()
+
 else:
     st.success(t["caught"])
     if st.button(t["unlock_btn"], type="primary"):
