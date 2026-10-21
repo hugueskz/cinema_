@@ -493,4 +493,5 @@ if st.session_state.quiz_passed:
                 conn.update(worksheet="Sheet1", data=updated_df)
                 st.toast("Saved to Google Sheet! 📊", icon="✅")
             except Exception as e:
+                st.error(f"Erreur Google Sheets : {e}")
                 pass
