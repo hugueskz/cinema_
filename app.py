@@ -123,8 +123,8 @@ t = {
     }
 }[lang]
 
-# Banner Image / GIF Header
-st.image("https://media.giphy.com/media/l0HlBO7eyXzSZkJri/giphy.gif", use_container_width=True)
+# Banner GIF (Vintage Black and White Cinema Projector)
+st.image("https://media.giphy.com/media/xUPGcm3W4y96P1hK92/giphy.gif", use_container_width=True)
 
 st.title(t["title"])
 st.write(t["subtitle"])
@@ -213,8 +213,8 @@ if st.session_state.quiz_passed:
         st.balloons()
         st.success(t["invitation_title"])
         
-        # Celebratory GIF
-        st.image("https://media.giphy.com/media/26AHPxxnSw1L9T1rW/giphy.gif", caption="Popcorn time! 🍿", use_container_width=True)
+        # Celebratory Black and White Cinema GIF
+        st.image("https://media.giphy.com/media/3o7TKSjRrfIPjeiVyM/giphy.gif", caption="Classic Cinema Vibe 🎞️", use_container_width=True)
         
         st.markdown(f"### {t['config_title']}")
         
@@ -257,5 +257,4 @@ if st.session_state.quiz_passed:
                 updated_df = pd.concat([existing_data, new_row], ignore_index=True)
                 conn.update(worksheet="Sheet1", data=updated_df)
             except Exception as e:
-                # Silently fail or print error so user experience isn't broken
                 pass
