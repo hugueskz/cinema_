@@ -476,8 +476,7 @@ if st.session_state.quiz_passed:
             </div>
             """, unsafe_allow_html=True)
             
-            # --- SAVE RESPONSES TO GOOGLE SHEETS ---
-            try:
+           try:
                 conn = st.connection("gsheets", type=GSheetsConnection)
                 existing_data = conn.read(worksheet="Sheet1", ttl=0)
                 
