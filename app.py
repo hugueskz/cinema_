@@ -123,8 +123,8 @@ t = {
     }
 }[lang]
 
-# Banner GIF (Vintage Black and White Cinema Projector)
-st.image("https://media.giphy.com/media/xUPGcm3W4y96P1hK92/giphy.gif", use_container_width=True)
+# Main Banner Photo (La Dolce Vita Poster)
+st.image("https://m.media-amazon.com/images/M/MV5BMTkxMjQ4NzU5N15BMl5BanBnXkFtZTgwMTkwODkzMTE@._V1_FMjpg_UX1000_.jpg", use_container_width=True)
 
 st.title(t["title"])
 st.write(t["subtitle"])
@@ -213,8 +213,8 @@ if st.session_state.quiz_passed:
         st.balloons()
         st.success(t["invitation_title"])
         
-        # Celebratory Black and White Cinema GIF
-        st.image("https://media.giphy.com/media/3o7TKSjRrfIPjeiVyM/giphy.gif", caption="Classic Cinema Vibe 🎞️", use_container_width=True)
+        # Les Quatre Cents Coups (1959) Still Image
+        st.image("https://m.media-amazon.com/images/M/MV5BODZiZjAzYzUtMDUwNS00Y2UwLWIwNDUtNTJjOTZkNzU3NGY1XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg", caption="Les Quatre Cents Coups (1959) 🎞️", use_container_width=True)
         
         st.markdown(f"### {t['config_title']}")
         
