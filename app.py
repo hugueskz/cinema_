@@ -129,7 +129,7 @@ t = {
     }
 }[lang]
 
-# Banner Image
+# Banner Image (La Dolce Vita Poster)
 st.image("https://m.media-amazon.com/images/M/MV5BMTkxMjQ4NzU5N15BMl5BanBnXkFtZTgwMTkwODkzMTE@._V1_FMjpg_UX1000_.jpg", use_container_width=True)
 
 st.title(t["title"])
@@ -160,7 +160,7 @@ if not st.session_state.player_name:
             st.warning("Please enter a valid name / Per favore inserisci un nome valido")
     st.stop()
 
-# Welcome Banner
+# Welcome Banner with Player Name
 st.markdown(f"### 👋 Welcome / Benvenuta/o, **{st.session_state.player_name}**!")
 st.markdown("---")
 
@@ -382,7 +382,6 @@ if not st.session_state.game_won:
     """
     st.components.v1.html(game_html, height=430)
     
-    # Manual bypass button directly visible under game
     if st.button(t["manual_skip"]):
         st.session_state.game_won = True
         st.rerun()
@@ -476,6 +475,7 @@ if st.session_state.quiz_passed:
             </div>
             """, unsafe_allow_html=True)
             
+            # --- SAVE RESPONSES TO GOOGLE SHEETS ---
             try:
                 conn = st.connection("gsheets", type=GSheetsConnection)
                 existing_data = conn.read(worksheet="Sheet1", ttl=0)
