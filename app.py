@@ -1,5 +1,7 @@
 import streamlit as st
 import random
+import pandas as pd
+from streamlit_gsheets import GSheetsConnection
 
 # Page configuration
 st.set_page_config(
@@ -121,6 +123,9 @@ t = {
     }
 }[lang]
 
+# Banner Image / GIF Header
+st.image("https://media.giphy.com/media/l0HlBO7eyXzSZkJri/giphy.gif", use_container_width=True)
+
 st.title(t["title"])
 st.write(t["subtitle"])
 st.markdown("---")
@@ -208,6 +213,9 @@ if st.session_state.quiz_passed:
         st.balloons()
         st.success(t["invitation_title"])
         
+        # Celebratory GIF
+        st.image("https://media.giphy.com/media/26AHPxxnSw1L9T1rW/giphy.gif", caption="Popcorn time! 🍿", use_container_width=True)
+        
         st.markdown(f"### {t['config_title']}")
         
         col_c1, col_c2 = st.columns(2)
@@ -232,3 +240,22 @@ if st.session_state.quiz_passed:
                 <p><i>{t['footer']}</i></p>
             </div>
             """, unsafe_allow_html=True)
+            
+            # --- SAVE RESPONSES TO GOOGLE SHEETS ---
+            try:
+                conn = st.connection("gsheets", type=GSheetsConnection)
+                existing_data = conn.read(worksheet="Sheet1", ttl=0)
+                
+                new_row = pd.DataFrame([{
+                    "Status": "Accepted",
+                    "Genre": chosen_genre,
+                    "Snack": chosen_snack,
+                    "Date": str(chosen_date),
+                    "Time": str(chosen_time)
+                }])
+                
+                updated_df = pd.concat([existing_data, new_row], ignore_index=True)
+                conn.update(worksheet="Sheet1", data=updated_df)
+            except Exception as e:
+                # Silently fail or print error so user experience isn't broken
+                pass
