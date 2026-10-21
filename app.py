@@ -47,6 +47,7 @@ t = {
         "name_btn": "Start Challenge 🎬",
         "step1": "Phase 1: Noir Cinema Showdown 🍿",
         "caught": "🎉 Villain Defeated! Phase 1 completed!",
+        "unlock_btn": "🔓 Continue to Quiz / Continua al Quiz",
         "step2": "Phase 2: 50s & 60s French & Italian Cinema Quiz 🎥",
         "quiz_intro": "Answer these 3 classic movie questions to calculate your Film Critic Rank:",
         "q1": "1. Who directed the iconic 1960 Italian film 'La Dolce Vita'?",
@@ -89,6 +90,7 @@ t = {
         "name_btn": "Inizia la Sfida 🎬",
         "step1": "Fase 1: Scontro Film Noir 🍿",
         "caught": "🎉 Cattivo Sconfitto! Fase 1 completata!",
+        "unlock_btn": "🔓 Continua al Quiz / Continue to Quiz",
         "step2": "Fase 2: Quiz sul Cinema Francese e Italiano Anni '50 e '60 🎥",
         "quiz_intro": "Rispondi a queste 3 domande per scoprire il tuo livello di Critico Cinematografico:",
         "q1": "1. Chi ha diretto il celebre film italiano del 1960 'La Dolce Vita'?",
@@ -161,14 +163,14 @@ st.markdown(f"### 👋 Welcome / Benvenuta/o, **{st.session_state.player_name}**
 
 st.markdown("---")
 
-# --- STEP 1: ENHANCED RETRO NOIR GAME ---
+# --- STEP 1: RETRO NOIR GAME WITH SOUND & EASY HP ---
 st.subheader(t["step1"])
-if not st.session_state.game_won:
-    query_params = st.query_params
-    if query_params.get("game_status") == "won":
-        st.session_state.game_won = True
-        st.rerun()
 
+query_params = st.query_params
+if query_params.get("game_status") == "won":
+    st.session_state.game_won = True
+
+if not st.session_state.game_won:
     game_html = """
     <div style="text-align: center; background-color: #050508; padding: 12px; border-radius: 12px; border: 1px solid #333;">
         <canvas id="noirCanvas" width="600" height="350" style="border:2px solid #444; background: #000; max-width: 100%; border-radius: 8px;"></canvas>
@@ -185,12 +187,51 @@ if not st.session_state.game_won:
     const canvas = document.getElementById("noirCanvas");
     const ctx = canvas.getContext("2d");
 
+    // Web Audio Synthesizer Sound Effects
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    function playSound(type) {
+        if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'punch') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.15);
+        } else if (type === 'flash') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.3);
+            gain.gain.setValueAtTime(0.6, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        } else if (type === 'win') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime + 0.1);
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime + 0.2);
+            gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.4);
+        }
+    }
+
+    // Player and Boss setup (Boss HP reduced to 50 for quick victory)
     let player = { x: 90, y: 190, w: 55, h: 120, hp: 100, attacking: false };
-    let boss = { x: 440, y: 180, w: 65, h: 130, hp: 100, state: 'idle' };
+    let boss = { x: 440, y: 180, w: 65, h: 130, hp: 50, state: 'idle' };
     let gameOver = false;
     let rain = [];
 
-    for(let i=0; i<40; i++) {
+    for(let i=0; i<30; i++) {
         rain.push({ x: Math.random()*600, y: Math.random()*350, l: Math.random()*15+5, s: Math.random()*5+10 });
     }
 
@@ -209,69 +250,33 @@ if not st.session_state.game_won:
     }
 
     function drawTexturePlayer() {
-        // Detective Coat & Texture
         ctx.fillStyle = "#2b2b36";
         ctx.fillRect(player.x, player.y + 35, player.w, 75);
-        
-        // Pinstripes
-        ctx.strokeStyle = "#3e3e4d";
-        ctx.lineWidth = 1;
-        for(let i = 5; i < player.w; i += 10) {
-            ctx.beginPath();
-            ctx.moveTo(player.x + i, player.y + 35);
-            ctx.lineTo(player.x + i, player.y + 110);
-            ctx.stroke();
-        }
-
-        // Belt & Collar
-        ctx.fillStyle = "#15151c";
-        ctx.fillRect(player.x, player.y + 65, player.w, 8);
-        ctx.fillStyle = "#e6d7c3"; // Shirt
+        ctx.fillStyle = "#e6d7c3";
         ctx.fillRect(player.x + 20, player.y + 35, 15, 15);
-        ctx.fillStyle = "#aa2222"; // Tie
+        ctx.fillStyle = "#aa2222";
         ctx.fillRect(player.x + 26, player.y + 40, 4, 18);
-
-        // Head & Fedora
         ctx.fillStyle = "#d1a884";
         ctx.fillRect(player.x + 15, player.y + 12, 25, 23);
-        ctx.fillStyle = "#1a1a24"; // Fedora Hat
+        ctx.fillStyle = "#1a1a24";
         ctx.fillRect(player.x + 5, player.y + 10, 45, 7);
         ctx.fillRect(player.x + 12, player.y - 8, 31, 18);
-        ctx.fillStyle = "#aa2222"; // Hat Ribbon
-        ctx.fillRect(player.x + 12, player.y + 5, 31, 5);
 
-        // Punch Animation
         if (player.attacking) {
             ctx.fillStyle = "#d1a884";
             ctx.fillRect(player.x + player.w, player.y + 45, 30, 14);
-            ctx.fillStyle = "#ffffff";
-            ctx.fillRect(player.x + player.w + 22, player.y + 43, 10, 18); // Glove/Bandage
         }
     }
 
     function drawTextureBoss() {
         let isHit = boss.state === 'hit';
-        
-        // Villain Trench Coat
         ctx.fillStyle = isHit ? "#881a1a" : "#181313";
         ctx.fillRect(boss.x, boss.y + 40, boss.w, 85);
-
-        // Lapels & Shadow Texture
-        ctx.fillStyle = isHit ? "#a82222" : "#2d2222";
-        ctx.beginPath();
-        ctx.moveTo(boss.x + 10, boss.y + 40);
-        ctx.lineTo(boss.x + 32, boss.y + 80);
-        ctx.lineTo(boss.x + 55, boss.y + 40);
-        ctx.fill();
-
-        // Head & Glowing Eyes
         ctx.fillStyle = "#a8866b";
         ctx.fillRect(boss.x + 18, boss.y + 12, 28, 28);
-        ctx.fillStyle = "#ff2222"; // Glowing Red Eyes
+        ctx.fillStyle = "#ff2222";
         ctx.fillRect(boss.x + 24, boss.y + 22, 5, 4);
         ctx.fillRect(boss.x + 36, boss.y + 22, 5, 4);
-
-        // Villain Hat
         ctx.fillStyle = "#0a0808";
         ctx.fillRect(boss.x + 8, boss.y + 10, 50, 7);
         ctx.fillRect(boss.x + 16, boss.y - 10, 34, 20);
@@ -281,21 +286,9 @@ if not st.session_state.game_won:
         ctx.fillStyle = "#08080c";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Brick Wall Background Texture
-        ctx.strokeStyle = "#14141d";
-        ctx.lineWidth = 1;
-        for(let y=0; y<290; y+=20) {
-            ctx.beginPath();
-            ctx.moveTo(0, y);
-            ctx.lineTo(canvas.width, y);
-            ctx.stroke();
-        }
-
-        // Wet Sidewalk
         ctx.fillStyle = "#121218";
         ctx.fillRect(0, 290, canvas.width, 60);
 
-        // Streetlamp Cone Spotlight
         let grad = ctx.createRadialGradient(300, 40, 10, 300, 200, 280);
         grad.addColorStop(0, "rgba(255, 245, 200, 0.28)");
         grad.addColorStop(1, "rgba(0, 0, 0, 0.85)");
@@ -306,7 +299,7 @@ if not st.session_state.game_won:
         drawTexturePlayer();
         drawTextureBoss();
 
-        // Health Bars UI
+        // Health Bars
         ctx.fillStyle = "#222";
         ctx.fillRect(20, 15, 160, 18);
         ctx.fillRect(420, 15, 160, 18);
@@ -314,29 +307,29 @@ if not st.session_state.game_won:
         ctx.fillStyle = "#00e676";
         ctx.fillRect(22, 17, player.hp * 1.56, 14);
         ctx.fillStyle = "#ff1744";
-        ctx.fillRect(422, 17, boss.hp * 1.56, 14);
+        ctx.fillRect(422, 17, boss.hp * 3.12, 14);
 
         ctx.strokeStyle = "#fff";
         ctx.strokeRect(20, 15, 160, 18);
         ctx.strokeRect(420, 15, 160, 18);
-
-        ctx.fillStyle = "#ffffff";
-        ctx.font = "bold 11px sans-serif";
-        ctx.fillText("HERO DETECTIVE", 22, 12);
-        ctx.fillText("NOIR VILLAIN", 422, 12);
     }
 
     function updateBoss() {
         if (gameOver) return;
         if (Math.abs(player.x - boss.x) > 65) {
-            if (boss.x > player.x) boss.x -= 1.8;
-            else boss.x += 1.8;
-        } else {
-            if (Math.random() < 0.04) {
-                player.hp -= 9;
-                if (player.hp <= 0) player.hp = 0;
-            }
+            if (boss.x > player.x) boss.x -= 1.2;
+            else boss.x += 1.2;
         }
+    }
+
+    function triggerWin() {
+        gameOver = true;
+        playSound('win');
+        setTimeout(() => {
+            const url = new URL(window.location.href);
+            url.searchParams.set("game_status", "won");
+            window.parent.location.href = url.href;
+        }, 300);
     }
 
     function movePlayer(dx) {
@@ -346,38 +339,30 @@ if not st.session_state.game_won:
 
     function punch() {
         if (gameOver) return;
+        playSound('punch');
         player.attacking = true;
         setTimeout(() => { player.attacking = false; }, 150);
 
-        if (Math.abs((player.x + player.w) - boss.x) < 45) {
-            boss.hp -= 15;
+        if (Math.abs((player.x + player.w) - boss.x) < 55) {
+            boss.hp -= 25; // Massive hit
             boss.state = 'hit';
             setTimeout(() => { boss.state = 'idle'; }, 150);
             if (boss.hp <= 0) {
                 boss.hp = 0;
-                gameOver = true;
-                setTimeout(() => {
-                    const url = new URL(window.location.href);
-                    url.searchParams.set("game_status", "won");
-                    window.parent.location.href = url.href;
-                }, 400);
+                triggerWin();
             }
         }
     }
 
     function flashAttack() {
         if (gameOver) return;
+        playSound('flash');
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        boss.hp -= 25;
+        boss.hp -= 35; // Instant high damage
         if (boss.hp <= 0) {
             boss.hp = 0;
-            gameOver = true;
-            setTimeout(() => {
-                const url = new URL(window.location.href);
-                url.searchParams.set("game_status", "won");
-                window.parent.location.href = url.href;
-            }, 400);
+            triggerWin();
         }
     }
 
@@ -400,6 +385,9 @@ if not st.session_state.game_won:
     st.components.v1.html(game_html, height=450)
 else:
     st.success(t["caught"])
+    if st.button(t["unlock_btn"], type="primary"):
+        st.session_state.game_won = True
+        st.rerun()
 
 st.markdown("---")
 
