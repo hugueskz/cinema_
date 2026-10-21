@@ -162,4 +162,73 @@ if st.session_state.game_won:
     if not st.session_state.quiz_passed:
         st.write(t["quiz_intro"])
         
-        q1_ans = st.radio(t
+        q1_ans = st.radio(t["q1"], t["q1_opts"], key="q1_ans")
+        q2_ans = st.radio(t["q2"], t["q2_opts"], key="q2_ans")
+        q3_ans = st.radio(t["q3"], t["q3_opts"], key="q3_ans")
+        
+        if st.button("Submit Quiz Answers / Invia Risposte"):
+            correct_1 = q1_ans.startswith("Federico Fellini")
+            correct_2 = q2_ans.startswith("The 400 Blows") or q2_ans.startswith("I 400 colpi")
+            correct_3 = q3_ans.startswith("Marcello Mastroianni")
+            
+            if correct_1 and correct_2 and correct_3:
+                st.session_state.quiz_passed = True
+                st.success(t["quiz_success"])
+                st.rerun()
+            else:
+                st.error(t["quiz_fail"])
+    else:
+        st.success(t["quiz_success"])
+else:
+    st.info("🔒 Complete Phase 1 to unlock the quiz! / Completa la Fase 1 per sbloccare il quiz!")
+
+st.markdown("---")
+
+# --- STEP 3: THE SECRET REWARD (DATE INVITATION) ---
+if st.session_state.quiz_passed:
+    st.subheader(t["step3"])
+    if not st.session_state.accepted:
+        st.markdown(f"### ✨ {t['invitation_title']}")
+        st.write(t["invitation_text"])
+        
+        col_yes, col_no = st.columns(2)
+        
+        with col_yes:
+            if st.button(t["btn_yes"], type="primary"):
+                st.session_state.accepted = True
+                st.rerun()
+                
+        with col_no:
+            no_texts = t["btn_no"]
+            current_idx = min(st.session_state.no_click_count, len(no_texts) - 1)
+            if st.button(no_texts[current_idx]):
+                st.session_state.no_click_count += 1
+                st.rerun()
+    else:
+        st.balloons()
+        st.success(t["invitation_title"])
+        
+        st.markdown(f"### {t['config_title']}")
+        
+        col_c1, col_c2 = st.columns(2)
+        with col_c1:
+            chosen_genre = st.selectbox(t["genre_label"], t["genres"])
+            chosen_snack = st.selectbox(t["snack_label"], t["snacks"])
+        with col_c2:
+            chosen_date = st.date_input(t["date_label"])
+            chosen_time = st.time_input(t["time_label"])
+            
+        if st.button(t["confirm_btn"], type="primary"):
+            st.markdown("---")
+            st.markdown(f"""
+            <div class="ticket-box">
+                <h2>{t['ticket_header']}</h2>
+                <hr style="border: 1px dashed #ccc;">
+                <p><b>{t['admit']}</b></p>
+                <p>🎬 <b>Vibe/Genre:</b> {chosen_genre}</p>
+                <p>🍿 <b>Snack:</b> {chosen_snack}</p>
+                <p>📅 <b>Date:</b> {chosen_date} at {chosen_time}</p>
+                <br>
+                <p><i>{t['footer']}</i></p>
+            </div>
+            """, unsafe_allow_html=True)
