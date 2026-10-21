@@ -3,7 +3,7 @@ import random
 
 # Page configuration
 st.set_page_config(
-    page_title="Special Cinema Invitation / Invito Speciale al Cinema",
+    page_title="Classic Cinema Challenge / Challenge Cinema Classico",
     page_icon="🎬",
     layout="centered"
 )
@@ -38,25 +38,25 @@ lang = st.sidebar.radio("Choose / Scegli:", ["English", "Italiano"])
 # Translations dictionary
 t = {
     "English": {
-        "title": "🎬 A Special Invitation Awaits...",
-        "subtitle": "Before you can see what this is about, you need to pass a couple of quick, fun tests! 😉",
-        "step1": "Step 1: The Popcorn Mini-Game 🍿",
-        "game_intro": "Catch the golden popcorn to unlock the cinema date! Click the correct box where the popcorn is hiding.",
-        "caught": "🎉 You caught the golden popcorn! Step 1 complete!",
-        "miss": "❌ Oops, just regular kernels! Try another box.",
-        "step2": "Step 2: Easy 50s & 60s Cinema Quiz 🎥",
-        "quiz_intro": "Let's test your retro film knowledge (French & Italian masterpieces)!",
+        "title": "🎬 The Great Classic Film Challenge",
+        "subtitle": "Test your reflexes and classic 50s & 60s cinema knowledge to unlock your official score!",
+        "step1": "Phase 1: Popcorn Reflex Test 🍿",
+        "game_intro": "Before testing your cinema knowledge, let's test your focus! Find the hidden golden popcorn box.",
+        "caught": "🎉 Perfect reflexes! Phase 1 completed!",
+        "miss": "❌ Just empty kernels! Try another box.",
+        "step2": "Phase 2: 50s & 60s French & Italian Cinema Quiz 🎥",
+        "quiz_intro": "Answer these 3 classic movie questions to calculate your Film Critic Rank:",
         "q1": "1. Who directed the iconic 1960 Italian film 'La Dolce Vita'?",
         "q1_opts": ["Federico Fellini", "Jean-Luc Godard", "Vittorio De Sica"],
         "q2": "2. Which legendary French New Wave film features Antoine Doinel and was directed by François Truffaut in 1959?",
         "q2_opts": ["Breathless / À bout de souffle", "The 400 Blows / Les Quatre Cents Coups", "Hiroshima mon amour"],
         "q3": "3. Who was the iconic Italian actor starring alongside Anita Ekberg in the Trevi Fountain scene?",
         "q3_opts": ["Alain Delon", "Jean-Paul Belmondo", "Marcello Mastroianni"],
-        "quiz_success": "🌟 Amazing! You passed the film quiz with flying colors!",
+        "quiz_success": "🌟 100% Correct! You unlocked the secret reward...",
         "quiz_fail": "💡 Not quite! Review your classic cinema history and try again.",
-        "step3": "Step 3: The Big Question 🍿❤️",
-        "invitation_title": "You've unlocked the ultimate invitation!",
-        "invitation_text": "Would you do me the absolute honor of going to the cinema with me?",
+        "step3": "🎁 Secret Reward Unlocked!",
+        "invitation_title": "Surprise! 🎬❤️",
+        "invitation_text": "Since you clearly know your movies and have great taste, would you do me the honor of going to the cinema with me?",
         "btn_yes": "YES! Absolutely! 🥰",
         "btn_no": [
             "No",
@@ -79,25 +79,25 @@ t = {
         "footer": "Can't wait to see you there! ✨"
     },
     "Italiano": {
-        "title": "🎬 Un Invito Speciale Ti Aspetta...",
-        "subtitle": "Prima di scoprire di cosa si tratta, devi superare due piccoli test divertenti! 😉",
-        "step1": "Fase 1: Il Mini-Gioco dei Popcorn 🍿",
-        "game_intro": "Prendi il popcorn d'oro per sbloccare l'invito al cinema! Clicca sulla scatola giusta.",
-        "caught": "🎉 Hai preso il popcorn d'oro! Fase 1 completata!",
-        "miss": "❌ Ops, solo normali chicchi! Prova un'altra scatola.",
-        "step2": "Fase 2: Facile Quiz sul Cinema degli Anni '50 e '60 🎥",
-        "quiz_intro": "Mettiamo alla prova la tua conoscenza dei capolavori francesi e italiani!",
+        "title": "🎬 Il Grande Test sul Cinema Classico",
+        "subtitle": "Metti alla prova i tuoi riflessi e le tue conoscenze sul cinema anni '50 e '60 per sbloccare il tuo punteggio!",
+        "step1": "Fase 1: Test di Riflessi Popcorn 🍿",
+        "game_intro": "Prima del quiz cinematografico, testiamo la tua concentrazione! Trova la scatola con il popcorn d'oro.",
+        "caught": "🎉 Riflessi perfetti! Fase 1 completata!",
+        "miss": "❌ Solo chicchi vuoti! Prova un'altra scatola.",
+        "step2": "Fase 2: Quiz sul Cinema Francese e Italiano Anni '50 e '60 🎥",
+        "quiz_intro": "Rispondi a queste 3 domande per scoprire il tuo livello di Critico Cinematografico:",
         "q1": "1. Chi ha diretto il celebre film italiano del 1960 'La Dolce Vita'?",
         "q1_opts": ["Federico Fellini", "Jean-Luc Godard", "Vittorio De Sica"],
         "q2": "2. Quale iconico film della Nouvelle Vague francese ha per protagonista Antoine Doinel (1959)?",
         "q2_opts": ["Fino all'ultimo respiro / À bout de souffle", "I 400 colpi / Les Quatre Cents Coups", "Hiroshima mon amour"],
         "q3": "3. Chi è il leggendario attore italiano accanto ad Anita Ekberg nella fontana di Trevi?",
         "q3_opts": ["Alain Delon", "Jean-Paul Belmondo", "Marcello Mastroianni"],
-        "quiz_success": "🌟 Fantastico! Hai superato il quiz cinematografico a pieni voti!",
+        "quiz_success": "🌟 100% Corretto! Hai sbloccato la ricompensa segreta...",
         "quiz_fail": "💡 Quasi! Ripassa un po' di cinema classico e riprova.",
-        "step3": "Fase 3: La Grande Domanda 🍿❤️",
-        "invitation_title": "Hai sbloccato l'invito definitivo!",
-        "invitation_text": "Mi faresti l'immenso piacere di venire al cinema con me?",
+        "step3": "🎁 Ricompensa Segreta Sbloccata!",
+        "invitation_title": "Sorpresa! 🎬❤️",
+        "invitation_text": "Visto che te ne intendi di cinema e hai un ottimo gusto, mi faresti l'onore di venire al cinema con me?",
         "btn_yes": "SI! Assolutamente! 🥰",
         "btn_no": [
             "No",
@@ -150,7 +150,6 @@ if not st.session_state.game_won:
                     st.rerun()
                 else:
                     st.warning(t["miss"])
-                    # Shuffle winning box slightly to keep it fun
                     st.session_state.winning_box = random.randint(0, 2)
 else:
     st.success(t["caught"])
@@ -163,76 +162,4 @@ if st.session_state.game_won:
     if not st.session_state.quiz_passed:
         st.write(t["quiz_intro"])
         
-        q1_ans = st.radio(t["q1"], t["q1_opts"], key="q1_ans")
-        q2_ans = st.radio(t["q2"], t["q2_opts"], key="q2_ans")
-        q3_ans = st.radio(t["q3"], t["q3_opts"], key="q3_ans")
-        
-        if st.button("Submit Quiz Answers / Invia Risposte"):
-            # Correct answers check
-            correct_1 = q1_ans.startswith("Federico Fellini")
-            correct_2 = q2_ans.startswith("The 400 Blows") or q2_ans.startswith("I 400 colpi")
-            correct_3 = q3_ans.startswith("Marcello Mastroianni")
-            
-            if correct_1 and correct_2 and correct_3:
-                st.session_state.quiz_passed = True
-                st.success(t["quiz_success"])
-                st.rerun()
-            else:
-                st.error(t["quiz_fail"])
-    else:
-        st.success(t["quiz_success"])
-else:
-    st.info("🔒 Complete Step 1 to unlock the cinema quiz! / Completa la Fase 1 per sbloccare il quiz!")
-
-st.markdown("---")
-
-# --- STEP 3: THE INVITATION & CONFIGURATION ---
-st.subheader(t["step3"])
-if st.session_state.quiz_passed:
-    if not st.session_state.accepted:
-        st.markdown(f"### ✨ {t['invitation_title']}")
-        st.write(t["invitation_text"])
-        
-        col_yes, col_no = st.columns(2)
-        
-        with col_yes:
-            if st.button(t["btn_yes"], type="primary"):
-                st.session_state.accepted = True
-                st.rerun()
-                
-        with col_no:
-            no_texts = t["btn_no"]
-            current_idx = min(st.session_state.no_click_count, len(no_texts) - 1)
-            if st.button(no_texts[current_idx]):
-                st.session_state.no_click_count += 1
-                st.rerun()
-    else:
-        st.balloons()
-        st.success(t["invitation_title"])
-        
-        st.markdown(f"### {t['config_title']}")
-        
-        col_c1, col_c2 = st.columns(2)
-        with col_c1:
-            chosen_genre = st.selectbox(t["genre_label"], t["genres"])
-            chosen_snack = st.selectbox(t["snack_label"], t["snacks"])
-        with col_c2:
-            chosen_date = st.date_input(t["date_label"])
-            chosen_time = st.time_input(t["time_label"])
-            
-        if st.button(t["confirm_btn"], type="primary"):
-            st.markdown("---")
-            st.markdown(f"""
-            <div class="ticket-box">
-                <h2>{t['ticket_header']}</h2>
-                <hr style="border: 1px dashed #ccc;">
-                <p><b>{t['admit']}</b></p>
-                <p>🎬 <b>Vibe/Genre:</b> {chosen_genre}</p>
-                <p>🍿 <b>Snack:</b> {chosen_snack}</p>
-                <p>📅 <b>Date:</b> {chosen_date} at {chosen_time}</p>
-                <br>
-                <p><i>{t['footer']}</i></p>
-            </div>
-            """, unsafe_allow_html=True)
-else:
-    st.info("🔒 Complete Step 2 to unlock the final invitation! / Completa la Fase 2 per sbloccare l'invito finale!")
+        q1_ans = st.radio(t
