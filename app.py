@@ -1,7 +1,6 @@
 import streamlit as st
 import random
 import pandas as pd
-import json
 from streamlit_gsheets import GSheetsConnection
 
 # Page configuration
@@ -162,87 +161,179 @@ st.markdown(f"### 👋 Welcome / Benvenuta/o, **{st.session_state.player_name}**
 
 st.markdown("---")
 
-# --- STEP 1: RETRO NOIR GAME ---
+# --- STEP 1: ENHANCED RETRO NOIR GAME ---
 st.subheader(t["step1"])
 if not st.session_state.game_won:
-    # Check query params for game completion from JS canvas
     query_params = st.query_params
     if query_params.get("game_status") == "won":
         st.session_state.game_won = True
         st.rerun()
 
-    # Game Canvas HTML/JS
     game_html = """
-    <div style="text-align: center; background-color: #000; padding: 10px; border-radius: 12px;">
-        <canvas id="noirCanvas" width="600" height="350" style="border:2px solid #555; background: #050505; max-width: 100%;"></canvas>
-        <div style="margin-top: 10px;">
-            <button onclick="movePlayer(-20)" style="padding: 8px 16px; margin: 2px;">⬅️ Left</button>
-            <button onclick="movePlayer(20)" style="padding: 8px 16px; margin: 2px;">➡️ Right</button>
-            <button onclick="punch()" style="padding: 8px 16px; margin: 2px; background-color: #ff4b4b; color: white;">🥊 Punch</button>
-            <button onclick="flashAttack()" style="padding: 8px 16px; margin: 2px; background-color: #faca2b;">📸 Flash</button>
+    <div style="text-align: center; background-color: #050508; padding: 12px; border-radius: 12px; border: 1px solid #333;">
+        <canvas id="noirCanvas" width="600" height="350" style="border:2px solid #444; background: #000; max-width: 100%; border-radius: 8px;"></canvas>
+        <div style="margin-top: 12px;">
+            <button onclick="movePlayer(-20)" style="padding: 10px 18px; margin: 3px; font-weight: bold;">⬅️ Left</button>
+            <button onclick="movePlayer(20)" style="padding: 10px 18px; margin: 3px; font-weight: bold;">➡️ Right</button>
+            <button onclick="punch()" style="padding: 10px 18px; margin: 3px; background-color: #ff4b4b; color: white; font-weight: bold; border-radius: 6px;">🥊 Punch</button>
+            <button onclick="flashAttack()" style="padding: 10px 18px; margin: 3px; background-color: #faca2b; font-weight: bold; border-radius: 6px;">📸 Flash</button>
         </div>
-        <p style="color: #aaa; font-size: 12px; margin-top: 5px;">Use buttons or Keyboard (A/D/Arrows to Move, Space to Punch, S for Flash)</p>
+        <p style="color: #888; font-size: 12px; margin-top: 8px;">Controls: Buttons or Keyboard (A/D or Arrows to Move, Space to Punch, S for Flash)</p>
     </div>
 
     <script>
     const canvas = document.getElementById("noirCanvas");
     const ctx = canvas.getContext("2d");
 
-    let player = { x: 100, y: 220, w: 50, h: 90, hp: 100, attacking: false };
-    let boss = { x: 450, y: 210, w: 60, h: 100, hp: 100, state: 'idle' };
+    let player = { x: 90, y: 190, w: 55, h: 120, hp: 100, attacking: false };
+    let boss = { x: 440, y: 180, w: 65, h: 130, hp: 100, state: 'idle' };
     let gameOver = false;
+    let rain = [];
+
+    for(let i=0; i<40; i++) {
+        rain.push({ x: Math.random()*600, y: Math.random()*350, l: Math.random()*15+5, s: Math.random()*5+10 });
+    }
+
+    function drawRain() {
+        ctx.strokeStyle = "rgba(200, 200, 220, 0.25)";
+        ctx.lineWidth = 1;
+        for(let r of rain) {
+            ctx.beginPath();
+            ctx.moveTo(r.x, r.y);
+            ctx.lineTo(r.x - 2, r.y + r.l);
+            ctx.stroke();
+            r.y += r.s;
+            r.x -= 1;
+            if(r.y > 350) { r.y = 0; r.x = Math.random()*600; }
+        }
+    }
+
+    function drawTexturePlayer() {
+        // Detective Coat & Texture
+        ctx.fillStyle = "#2b2b36";
+        ctx.fillRect(player.x, player.y + 35, player.w, 75);
+        
+        // Pinstripes
+        ctx.strokeStyle = "#3e3e4d";
+        ctx.lineWidth = 1;
+        for(let i = 5; i < player.w; i += 10) {
+            ctx.beginPath();
+            ctx.moveTo(player.x + i, player.y + 35);
+            ctx.lineTo(player.x + i, player.y + 110);
+            ctx.stroke();
+        }
+
+        // Belt & Collar
+        ctx.fillStyle = "#15151c";
+        ctx.fillRect(player.x, player.y + 65, player.w, 8);
+        ctx.fillStyle = "#e6d7c3"; // Shirt
+        ctx.fillRect(player.x + 20, player.y + 35, 15, 15);
+        ctx.fillStyle = "#aa2222"; // Tie
+        ctx.fillRect(player.x + 26, player.y + 40, 4, 18);
+
+        // Head & Fedora
+        ctx.fillStyle = "#d1a884";
+        ctx.fillRect(player.x + 15, player.y + 12, 25, 23);
+        ctx.fillStyle = "#1a1a24"; // Fedora Hat
+        ctx.fillRect(player.x + 5, player.y + 10, 45, 7);
+        ctx.fillRect(player.x + 12, player.y - 8, 31, 18);
+        ctx.fillStyle = "#aa2222"; // Hat Ribbon
+        ctx.fillRect(player.x + 12, player.y + 5, 31, 5);
+
+        // Punch Animation
+        if (player.attacking) {
+            ctx.fillStyle = "#d1a884";
+            ctx.fillRect(player.x + player.w, player.y + 45, 30, 14);
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(player.x + player.w + 22, player.y + 43, 10, 18); // Glove/Bandage
+        }
+    }
+
+    function drawTextureBoss() {
+        let isHit = boss.state === 'hit';
+        
+        // Villain Trench Coat
+        ctx.fillStyle = isHit ? "#881a1a" : "#181313";
+        ctx.fillRect(boss.x, boss.y + 40, boss.w, 85);
+
+        // Lapels & Shadow Texture
+        ctx.fillStyle = isHit ? "#a82222" : "#2d2222";
+        ctx.beginPath();
+        ctx.moveTo(boss.x + 10, boss.y + 40);
+        ctx.lineTo(boss.x + 32, boss.y + 80);
+        ctx.lineTo(boss.x + 55, boss.y + 40);
+        ctx.fill();
+
+        // Head & Glowing Eyes
+        ctx.fillStyle = "#a8866b";
+        ctx.fillRect(boss.x + 18, boss.y + 12, 28, 28);
+        ctx.fillStyle = "#ff2222"; // Glowing Red Eyes
+        ctx.fillRect(boss.x + 24, boss.y + 22, 5, 4);
+        ctx.fillRect(boss.x + 36, boss.y + 22, 5, 4);
+
+        // Villain Hat
+        ctx.fillStyle = "#0a0808";
+        ctx.fillRect(boss.x + 8, boss.y + 10, 50, 7);
+        ctx.fillRect(boss.x + 16, boss.y - 10, 34, 20);
+    }
 
     function drawScene() {
-        ctx.fillStyle = "#0a0a0c";
+        ctx.fillStyle = "#08080c";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Ground
-        ctx.fillStyle = "#1a1a1a";
-        ctx.fillRect(0, 310, canvas.width, 40);
+        // Brick Wall Background Texture
+        ctx.strokeStyle = "#14141d";
+        ctx.lineWidth = 1;
+        for(let y=0; y<290; y+=20) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(canvas.width, y);
+            ctx.stroke();
+        }
 
-        // Streetlamp spotlight effect
-        let grad = ctx.createRadialGradient(300, 50, 20, 300, 200, 300);
-        grad.addColorStop(0, "rgba(255, 255, 220, 0.2)");
-        grad.addColorStop(1, "rgba(0, 0, 0, 0.9)");
+        // Wet Sidewalk
+        ctx.fillStyle = "#121218";
+        ctx.fillRect(0, 290, canvas.width, 60);
+
+        // Streetlamp Cone Spotlight
+        let grad = ctx.createRadialGradient(300, 40, 10, 300, 200, 280);
+        grad.addColorStop(0, "rgba(255, 245, 200, 0.28)");
+        grad.addColorStop(1, "rgba(0, 0, 0, 0.85)");
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Draw Player (Hero Detective)
-        ctx.fillStyle = "#333344";
-        ctx.fillRect(player.x, player.y, player.w, player.h); // Coat
-        ctx.fillStyle = "#aaaaaa";
-        ctx.fillRect(player.x + 10, player.y - 20, 30, 20); // Fedora hat
+        drawRain();
+        drawTexturePlayer();
+        drawTextureBoss();
 
-        if (player.attacking) {
-            ctx.fillStyle = "#ffffff";
-            ctx.fillRect(player.x + player.w, player.y + 30, 25, 12); // Punch arm
-        }
+        // Health Bars UI
+        ctx.fillStyle = "#222";
+        ctx.fillRect(20, 15, 160, 18);
+        ctx.fillRect(420, 15, 160, 18);
 
-        // Draw Boss (Noir Villain)
-        ctx.fillStyle = boss.state === 'hit' ? "#ff3333" : "#221111";
-        ctx.fillRect(boss.x, boss.y, boss.w, boss.h);
-        ctx.fillStyle = "#ffaa00";
-        ctx.fillRect(boss.x + 10, boss.y - 25, 40, 25); // Boss hat
+        ctx.fillStyle = "#00e676";
+        ctx.fillRect(22, 17, player.hp * 1.56, 14);
+        ctx.fillStyle = "#ff1744";
+        ctx.fillRect(422, 17, boss.hp * 1.56, 14);
 
-        // Health Bars
-        ctx.fillStyle = "#00ff00";
-        ctx.fillRect(20, 20, player.hp * 1.5, 12);
-        ctx.fillStyle = "#ff0000";
-        ctx.fillRect(410, 20, boss.hp * 1.5, 12);
+        ctx.strokeStyle = "#fff";
+        ctx.strokeRect(20, 15, 160, 18);
+        ctx.strokeRect(420, 15, 160, 18);
 
-        ctx.strokeStyle = "#ffffff";
-        ctx.strokeRect(20, 20, 150, 12);
-        ctx.strokeRect(410, 20, 150, 12);
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 11px sans-serif";
+        ctx.fillText("HERO DETECTIVE", 22, 12);
+        ctx.fillText("NOIR VILLAIN", 422, 12);
     }
 
     function updateBoss() {
         if (gameOver) return;
-        if (Math.abs(player.x - boss.x) > 60) {
-            if (boss.x > player.x) boss.x -= 1.5;
-            else boss.x += 1.5;
+        if (Math.abs(player.x - boss.x) > 65) {
+            if (boss.x > player.x) boss.x -= 1.8;
+            else boss.x += 1.8;
         } else {
-            if (Math.random() < 0.03) {
-                player.hp -= 8;
+            if (Math.random() < 0.04) {
+                player.hp -= 9;
                 if (player.hp <= 0) player.hp = 0;
             }
         }
@@ -258,7 +349,7 @@ if not st.session_state.game_won:
         player.attacking = true;
         setTimeout(() => { player.attacking = false; }, 150);
 
-        if (Math.abs((player.x + player.w) - boss.x) < 40) {
+        if (Math.abs((player.x + player.w) - boss.x) < 45) {
             boss.hp -= 15;
             boss.state = 'hit';
             setTimeout(() => { boss.state = 'idle'; }, 150);
@@ -266,11 +357,10 @@ if not st.session_state.game_won:
                 boss.hp = 0;
                 gameOver = true;
                 setTimeout(() => {
-                    window.parent.postMessage({type: 'streamlit:setQueryParams', queryParams: {game_status: 'won'}}, '*');
                     const url = new URL(window.location.href);
                     url.searchParams.set("game_status", "won");
                     window.parent.location.href = url.href;
-                }, 500);
+                }, 400);
             }
         }
     }
@@ -287,7 +377,7 @@ if not st.session_state.game_won:
                 const url = new URL(window.location.href);
                 url.searchParams.set("game_status", "won");
                 window.parent.location.href = url.href;
-            }, 500);
+            }, 400);
         }
     }
 
